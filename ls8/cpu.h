@@ -2,11 +2,17 @@
 #define _CPU_H_
 
 // Holds all information about the CPU
+// Type for a single unsigned byte is unsigned char
 struct cpu {
   // TODO
-  // PC
-  // registers (array)
+  // PC: Program Counter
+  unsigned char pc;
+
+  // registers (array): Instruction Register
+  unsigned char ir[256];
+
   // ram (array)
+  unsigned char memory[256];
 };
 
 // ALU operations
