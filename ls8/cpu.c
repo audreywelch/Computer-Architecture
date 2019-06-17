@@ -26,7 +26,7 @@ void cpu_load(struct cpu *cpu)
   // TODO: Replace this with something less hard-coded
 }
 
-void cpu_ram_read(struct cpu cpu_to_read) {
+void cpu_ram_read(struct cpu *cpu_to_read) {
 
 }
 
@@ -69,7 +69,14 @@ void cpu_run(struct cpu *cpu)
 /**
  * Initialize a CPU struct
  */
+
+// Takes a pointer to a struct cpu and initializes it as necessary
 void cpu_init(struct cpu *cpu)
 {
   // TODO: Initialize the PC and other special registers
+  cpu->pc = 0;
+
+  memset(cpu->ir, 0, sizeof(cpu->ir));
+  memset(cpu->ram, 0, sizeof(cpu->ram));
+
 }
