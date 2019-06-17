@@ -12,7 +12,7 @@ struct cpu {
   unsigned char ir[256];
 
   // ram (array)
-  unsigned char memory[256];
+  unsigned char ram[256];
 };
 
 // ALU operations

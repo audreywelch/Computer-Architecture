@@ -26,6 +26,14 @@ void cpu_load(struct cpu *cpu)
   // TODO: Replace this with something less hard-coded
 }
 
+void cpu_ram_read(struct cpu cpu_to_read) {
+
+}
+
+void cpu_ram_write(struct cpu *cpu_to_be_written_to, char *data) {
+
+}
+
 /**
  * ALU
  */
