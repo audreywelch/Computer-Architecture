@@ -1,0 +1,16 @@
+STEP 0: Inventory
+
+# Make a list of files here. Write a 3-10 word description of what each file does.
+
+Ls8
+1. cpu.c : reads RAM and writes to RAM, run the CPU, run ALU operations
+
+2. cpu.h : holds the information about the CPU [PC, registers, ram] and the ALU operations
+
+3. ls8.c : Main
+
+# Note what has been implemented, and what hasn't.
+
+# Read this whole file.
+
+# Skim the spec.
