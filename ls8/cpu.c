@@ -55,14 +55,53 @@ void cpu_run(struct cpu *cpu)
 {
   int running = 1; // True until we get a HLT instruction
 
+  unsigned char pc = cpu->pc;
+
   while (running) {
+    
     // TODO
     // 1. Get the value of the current instruction (in address PC).
+    unsigned char ir = cpu->ram[pc];
+
     // 2. Figure out how many operands this next instruction requires
+    
+
     // 3. Get the appropriate value(s) of the operands following this instruction
+    unsigned char operandA = cpu_ram_read(cpu->ram[pc + 1]);
+    unsigned char operandB = cpu_ram_read(cpu->ram[pc + 2]);
+
     // 4. switch() over it to decide on a course of action.
     // 5. Do whatever the instruction should do according to the spec.
     // 6. Move the PC to the next instruction.
+    switch (operandA) {
+      
+      case HLT:
+
+        // Halt the CPU & exit the emulator
+        running = 0;
+
+        // This is a _-byte instruction
+        // pc += _;
+        break;
+
+      case LDI:
+
+        // Set the value of a register to an integer
+
+        break;
+
+      case PRN:
+
+        // Print numeric value stored in the given register
+        // Print to the console the decimal integer value that is stored in the given register
+
+        break;
+
+      // Handle unknown instructions
+      default:
+        printf("Unknown instruction %02x at address %02x\n", ir, pc);
+        exit(1);
+    }
   }
 }
 
