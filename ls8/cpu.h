@@ -9,10 +9,13 @@ struct cpu {
   unsigned char pc;
 
   // registers (array): Instruction Register
-  unsigned char ir[256];
+  unsigned char registers[8];
 
   // ram (array)
   unsigned char ram[256];
+
+  // flag register
+  unsigned char flag;
 };
 
 // ALU operations
@@ -29,6 +32,7 @@ enum alu_op {
 #define LDI  0b10000010
 #define PRN  0b01000111
 // TODO: more instructions here. These can be used in cpu_run().
+#define HLT  0b00000001
 
 // Function declarations
 
