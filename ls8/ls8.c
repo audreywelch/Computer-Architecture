@@ -6,7 +6,7 @@
  */
 // argc = argument count
 // argv = array of strings that hold the individual arguments, starting with the command name itself
-int main(int argc, char *argv[])
+int main(int argc, char **argv)
 {
   struct cpu cpu;
 
@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
   }
 
   cpu_init(&cpu);
-  cpu_load(argv[1], &cpu);
+  cpu_load(&cpu, argv[1]);
   cpu_run(&cpu);
 
   return 0;

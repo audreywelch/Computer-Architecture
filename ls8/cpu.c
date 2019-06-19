@@ -3,8 +3,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#define DATA_LEN 6
-
 // Helper function to read a value from the specified index in RAM
 // Returns the read value
 // index = memory address register (mar)
@@ -21,16 +19,16 @@ void cpu_ram_write(struct cpu *cpu, unsigned char value, unsigned char index) {
 /**
  * Load the binary bytes from a .ls8 source file into a RAM array
  */
-void cpu_load(char *filename, struct cpu *cpu)
+void cpu_load(struct cpu *cpu, char *filename)
 {
 
-  FILE *fp;
+  FILE *fp = fopen(filename, "r");
   char line[1024];
 
-  int address = 0;
+  unsigned char ram_address = 0x00;
 
   // Open the file
-  if ((fp = fopen(filename, "r")) == NULL) {
+  if (fp == NULL) {
     fprintf(stderr, "Cannot open file %s\n", filename);
     exit(2);
   }
@@ -50,7 +48,7 @@ void cpu_load(char *filename, struct cpu *cpu)
     }
 
     // Store the value in memory/RAM
-    cpu_ram_write(cpu, byte, address++);
+    cpu_ram_write(cpu, byte, ram_address++);
   }
   fclose(fp);
 }
@@ -64,7 +62,9 @@ void alu(struct cpu *cpu, enum alu_op op, unsigned char regA, unsigned char regB
 {
   switch (op) {
     case ALU_MUL:
-      // TODO
+      // Multiply the values in two registers together and store the result in registerA
+      cpu->registers[regA] = cpu->registers[regA] * cpu->registers[regB];
+
       break;
 
     // TODO: implement more ALU ops
@@ -72,21 +72,21 @@ void alu(struct cpu *cpu, enum alu_op op, unsigned char regA, unsigned char regB
 }
 
 // // Helps trace what CPU is doing
-// void trace(struct cpu *cpu)
-// {
-//     printf("%02X | ", cpu->pc);
+void trace(struct cpu *cpu)
+{
+    printf("%02X | ", cpu->pc);
 
-//     printf("%02X %02X %02X |",
-//         cpu_ram_read(cpu, cpu->pc),
-//         cpu_ram_read(cpu, cpu->pc + 1),
-//         cpu_ram_read(cpu, cpu->pc + 2));
+    printf("%02X %02X %02X |",
+        cpu_ram_read(cpu, cpu->pc),
+        cpu_ram_read(cpu, cpu->pc + 1),
+        cpu_ram_read(cpu, cpu->pc + 2));
 
-//     for (int i = 0; i < 8; i++) {
-//         printf(" %02X", cpu->registers[i]);
-//     }
+    for (int i = 0; i < 8; i++) {
+        printf(" %02X", cpu->registers[i]);
+    }
 
-//     printf("\n");
-// }
+    printf("\n");
+}
 
 /**
  * Run the CPU
@@ -131,8 +131,8 @@ void cpu_run(struct cpu *cpu)
     // This line is shifting the instruction by 4 bits to access the flag that indicates whether the PC might be set, and then &'ing it to see if the bit is set to 0 or 1
     int instruction_set_pc = (ir >> 4) & 1;
     
-    //trace(cpu);
-    printf("TRACE: cpu-PC: %d: cpu-IR: %02X    operandA: %02x operandB: %02x\n", cpu->pc, ir, operandA, operandB);
+    trace(cpu);
+    //printf("TRACE: cpu-PC: %d: cpu-IR: %02X    operandA: %02x operandB: %02x\n", cpu->pc, ir, operandA, operandB);
 
     // 4. switch() over it to decide on a course of action.
     // 5. Do whatever the instruction should do according to the spec.
@@ -156,6 +156,15 @@ void cpu_run(struct cpu *cpu)
 
         // Print to the console the decimal integer value that is stored in the given register
         printf("%d\n", cpu->registers[operandA]);
+
+        break;
+
+      case MUL:
+
+        // Multiply the values in two registers together and store the result in registerA
+        //cpu->registers[operandA] = cpu->registers[operandA] * cpu->registers[operandB];
+
+        alu(cpu, ALU_MUL, operandA, operandB);
 
         break;
 

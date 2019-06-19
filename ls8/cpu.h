@@ -38,10 +38,11 @@ enum alu_op {
 #define PRN  0b01000111
 // TODO: more instructions here. These can be used in cpu_run().
 #define HLT  0b00000001
+#define MUL  0b10100010
 
 // Function declarations
 
-extern void cpu_load(char *filename, struct cpu *cpu);
+extern void cpu_load(struct cpu *cpu, char *filename);
 extern void cpu_init(struct cpu *cpu);
 extern void cpu_run(struct cpu *cpu);
 
