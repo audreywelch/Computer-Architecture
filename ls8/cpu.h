@@ -12,14 +12,15 @@ struct cpu {
   // PC: Program Counter
   unsigned char pc;
 
+  // flag register
+  unsigned char flag;
+
   // registers (array): Instruction Register
   unsigned char registers[8];
 
   // ram (array)
   unsigned char ram[256];
 
-  // flag register
-  unsigned char flag;
 };
 
 // ALU operations
@@ -40,7 +41,7 @@ enum alu_op {
 
 // Function declarations
 
-extern void cpu_load(struct cpu *cpu);
+extern void cpu_load(char *filename, struct cpu *cpu);
 extern void cpu_init(struct cpu *cpu);
 extern void cpu_run(struct cpu *cpu);
 
