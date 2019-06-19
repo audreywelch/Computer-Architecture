@@ -1,4 +1,8 @@
 #include "cpu.h"
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include "ls8.c"
 
 #define DATA_LEN 6
 
@@ -24,6 +28,42 @@ void cpu_load(struct cpu *cpu)
   }
 
   // TODO: Replace this with something less hard-coded
+  FILE *fp;
+  char line[1024];
+
+  // Check to see if there are exactly 2 arguments
+  if (argc != 2) {
+    printf("Usage: fileio filname\n");
+    return 1;
+  }
+
+  // Open the file
+  fp = fopen(argv[1], "r"); // fopen("print8.ls8", "r")
+
+  // Check for existing file
+  if (fp == NULL) {
+    printf("Error opening file %s\n", argv[1]);
+    return 2;
+  }
+
+  while (fgets(line, 1024, fp) != NULL) {
+    // Parse the line for an instruction
+
+    char *endpointer;
+
+    // Convert binary strings to integer values to store in RAM
+    unsigned char value = strtoul(line, &endpointer, 2); // Finds everything in binary
+
+    // Check if no numbers were found
+    if (line == endpointer) {
+      printf("SKIPPING: %s", line);
+      continue;
+    }
+
+    // Store the value in memory/RAM
+    //cpu->ram = value
+  }
+  fclose(fp);
 }
 
 // Helper function to read a value from the specified index in RAM
@@ -53,6 +93,23 @@ void alu(struct cpu *cpu, enum alu_op op, unsigned char regA, unsigned char regB
   }
 }
 
+// Helps trace what CPU is doing
+void trace(struct cpu *cpu)
+{
+    printf("%02X | ", cpu->pc);
+
+    printf("%02X %02X %02X |",
+        cpu_ram_read(cpu, cpu->pc),
+        cpu_ram_read(cpu, cpu->pc + 1),
+        cpu_ram_read(cpu, cpu->pc + 2));
+
+    for (int i = 0; i < 8; i++) {
+        printf(" %02X", cpu->registers[i]);
+    }
+
+    printf("\n");
+}
+
 /**
  * Run the CPU
  */
@@ -70,11 +127,16 @@ void cpu_run(struct cpu *cpu)
 
     // 2. Figure out how many operands this next instruction requires
     // This determines how much to add to the PC - # of operands + 1
-    int add_to_pc = (ir >> 6) + 1;
+    int num_operands = (ir >> 6);
+    int add_to_pc = num_operands + 1;
+
+    int value_in_mem;
     
     // 3. Get the appropriate value(s) of the operands following this instruction
     unsigned char operandA = cpu_ram_read(cpu, cpu->ram[pc + 1]);
     unsigned char operandB = cpu_ram_read(cpu, cpu->ram[pc + 2]);
+
+    trace(cpu);
 
     // 4. switch() over it to decide on a course of action.
     // 5. Do whatever the instruction should do according to the spec.
@@ -86,8 +148,6 @@ void cpu_run(struct cpu *cpu)
         // Halt the CPU & exit the emulator
         running = 0;
 
-        // This is a _-byte instruction
-        pc += add_to_pc;
         break;
 
       case LDI:
@@ -95,19 +155,15 @@ void cpu_run(struct cpu *cpu)
         // Set the value of a register to an integer
         cpu_ram_write(cpu, cpu->registers[operandA], cpu->registers[operandB]);
 
-        pc += add_to_pc;
-
         break;
 
       case PRN:
 
         // Print numeric value stored in the given register
-        unsigned char value = cpu_ram_read(cpu, operandA);
+        value_in_mem = cpu_ram_read(cpu, operandA);
 
         // Print to the console the decimal integer value that is stored in the given register
-        printf("%d\n", cpu->registers[value]);
-
-        pc += add_to_pc;
+        printf("%d\n", cpu->registers[value_in_mem]);
 
         break;
 
@@ -116,6 +172,9 @@ void cpu_run(struct cpu *cpu)
         printf("Unknown instruction %02x at address %02x\n", ir, pc);
         exit(1);
     }
+
+    // pc + instruction bytes
+    pc += add_to_pc;
 
   }
 }
@@ -139,3 +198,25 @@ void cpu_init(struct cpu *cpu)
 
   //cpu->registers[SP] = ADDR_EMPTY_STACK;
 }
+
+
+"""
+#define CHECK_BIT(var, pos) ((var) & (1 << (pos)))
+  765433210 bit numbers (pos)
+0b10101110
+
+x = 325;
+x = 0b101000101; // 325
+
+if (CHECK_BIT(x, 3)) {
+  printf("Bit 3 is set\n");
+}
+
+0b0001 << 3 == 0b1000
+
+x = 0b101000101
+  & 0b000001000 // 1 << 3
+  -------------
+    00000000000 //  means False - bit was not set
+
+"""

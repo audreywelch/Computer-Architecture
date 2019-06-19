@@ -1,6 +1,10 @@
 #ifndef _CPU_H_
 #define _CPU_H_
 
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+
 // Holds all information about the CPU
 // Type for a single unsigned byte is unsigned char
 struct cpu {
