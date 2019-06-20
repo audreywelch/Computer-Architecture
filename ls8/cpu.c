@@ -112,60 +112,60 @@ void cpu_run(struct cpu *cpu)
     unsigned int num_operands = (ir >> 6);
 
     // 3. Get the appropriate value(s) of the operands
-
-    // &'ing by 0xff is essentially modding by 0xff, or 255
-    // This just ensures that we wrap around if we ever reach
-    // the end of the 255 bytes of allocated RAM and don't go
-    // past it
-
     if (num_operands == 2) {
       operandA = cpu_ram_read(cpu, (cpu->pc + 1)  & 0xff);
       operandB = cpu_ram_read(cpu, (cpu->pc + 2)  & 0xff);
     } else if (num_operands == 1) {
       operandA = cpu_ram_read(cpu, (cpu->pc + 1)  & 0xff);
-    } // else {
-    //   return(1);
-    // }
+    }
     
     // True if this instruction might set the PC
     // This line is shifting the instruction by 4 bits to access the flag that indicates whether the PC might be set, and then &'ing it to see if the bit is set to 0 or 1
     int instruction_set_pc = (ir >> 4) & 1;
     
     trace(cpu);
-    //printf("TRACE: cpu-PC: %d: cpu-IR: %02X    operandA: %02x operandB: %02x\n", cpu->pc, ir, operandA, operandB);
 
     // 4. switch() over it to decide on a course of action.
     // 5. Do whatever the instruction should do according to the spec.
     // 6. Move the PC to the next instruction.
     switch (ir) {
+
+      case PUSH:
+
+        // Decrement the Stack Pointer
+        cpu->registers[SP]--;
+
+        // Copy the value in given register to the address pointed to by SP
+        cpu->ram[cpu->registers[SP]] = cpu->registers[operandA];
+        break;
+
+      case POP:
+
+        // Copy the value from the address pointed to by SP to the given register
+        cpu->registers[operandA] = cpu->ram[cpu->registers[SP]];
+
+        // Increment the Stack Pointer
+        cpu->registers[SP]++;
+        break;
       
       case HLT:
-
-        // Halt the CPU & exit the emulator
+        // Halt the CPU & exit the emulator 
         running = 0;
         break;
 
       case LDI:
-
         // Set the value of a register to an integer
         cpu->registers[operandA] = operandB;
-
         break;
 
       case PRN:
-
-        // Print to the console the decimal integer value that is stored in the given register
+        // Print to the console the decimal integer value stored in the given register
         printf("%d\n", cpu->registers[operandA]);
-
         break;
 
       case MUL:
-
         // Multiply the values in two registers together and store the result in registerA
-        //cpu->registers[operandA] = cpu->registers[operandA] * cpu->registers[operandB];
-
         alu(cpu, ALU_MUL, operandA, operandB);
-
         break;
 
       // Handle unknown instructions
@@ -174,7 +174,7 @@ void cpu_run(struct cpu *cpu)
         exit(3);
     }
 
-    // If it's not 1
+    // If it's not 1 / True
     if(!instruction_set_pc) {
 
       // Increment PC by the number of arguments that were passed to the instruction we just executed
