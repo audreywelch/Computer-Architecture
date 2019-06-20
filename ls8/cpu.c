@@ -64,10 +64,13 @@ void alu(struct cpu *cpu, enum alu_op op, unsigned char regA, unsigned char regB
     case ALU_MUL:
       // Multiply the values in two registers together and store the result in registerA
       cpu->registers[regA] = cpu->registers[regA] * cpu->registers[regB];
-
       break;
 
     // TODO: implement more ALU ops
+    case ALU_ADD:
+      // Add the value in two registers and store the result in registerA
+      cpu->registers[regA] = cpu->registers[regA] + cpu->registers[regB];
+      break;
   }
 }
 
@@ -146,14 +149,17 @@ void cpu_run(struct cpu *cpu)
         cpu->pc = cpu->registers[operandA];
 
         // Account for later when we reset the PC
-        num_operands = -1
+        num_operands = -1;
 
         break;
 
       case RET: // Return from subroutine
 
-        // Pop the value from the top of the stack and store it in the PC
+        // Pop the value (return address) from the top of the stack and store it in the PC
+        cpu->pc = cpu->ram[cpu->registers[SP]];
 
+        cpu->registers[SP]++;
+        
         break;
 
       case PUSH:
@@ -192,6 +198,13 @@ void cpu_run(struct cpu *cpu)
       case MUL:
         // Multiply the values in two registers together and store the result in registerA
         alu(cpu, ALU_MUL, operandA, operandB);
+        break;
+
+      case ADD:
+
+        // Add the value in two registers and store the result in registerA
+        alu(cpu, ALU_ADD, operandA, operandB);
+
         break;
 
       // Handle unknown instructions
