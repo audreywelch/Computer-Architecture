@@ -130,6 +130,32 @@ void cpu_run(struct cpu *cpu)
     // 6. Move the PC to the next instruction.
     switch (ir) {
 
+      case CALL: // Calls a subroutine at the address stored in the register
+
+        // 1. The address of the instruction directly after CALL is pushed onto the stack. This allows us to return to where we left off when the subroutine finishes executing
+
+        // Decrement the stack pointer
+        cpu->registers[SP]--;
+
+        // Push the address where we currently are onto the stack
+        cpu->ram[cpu->registers[SP]] = cpu->pc + 2;
+
+        // 2. The PC is set to the address stored in the given register. We jump to that location in RAM and execute the first instruction in the subroutine.
+        
+        // Set the PC to the subroutine address, which is provided in the first operand
+        cpu->pc = cpu->registers[operandA];
+
+        // Account for later when we reset the PC
+        num_operands = -1
+
+        break;
+
+      case RET: // Return from subroutine
+
+        // Pop the value from the top of the stack and store it in the PC
+
+        break;
+
       case PUSH:
 
         // Decrement the Stack Pointer

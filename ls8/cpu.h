@@ -42,6 +42,8 @@ enum alu_op {
 #define PUSH 0b01000101
 #define POP  0b01000110
 #define SP   7 // Points to the value at the top of the stack / most recently pushed
+#define CALL 01010000
+#define RET 00010001
 
 // Function declarations
 
